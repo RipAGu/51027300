@@ -27,9 +27,9 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Account loginRequest) {
-        Optional<Account> user = accountRepository.findByUsername(loginRequest.getUsername());
+        Optional<Account> user = accountRepository.findByUsername(loginRequest.getName());
         if (user.isPresent() && passwordEncoder.matches(loginRequest.getPassword(), user.get().getPassword())) {
-            String token = jwtUtil.generateToken(user.get().getUsername());
+            String token = jwtUtil.generateToken(user.get().getName());
 
             // JSON 응답 데이터 구성
             Map<String, String> response = new HashMap<>();

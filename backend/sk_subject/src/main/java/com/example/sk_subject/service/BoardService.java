@@ -1,53 +1,43 @@
 package com.example.sk_subject.service;
 
+import com.example.sk_subject.dto.response.BoardResponseDto;
 import com.example.sk_subject.entity.Board;
+import com.example.sk_subject.repository.AttachmentRepository;
 import com.example.sk_subject.repository.BoardRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
+@RequiredArgsConstructor
 public class BoardService {
 
     private final BoardRepository boardRepository;
+    private final AttachmentRepository attachmentRepository;
 
-    public BoardService(BoardRepository boardRepository) {
-        this.boardRepository = boardRepository;
-    }
+    public Page<BoardResponseDto> getBoards(String searchType, String keyword, Pageable pageable) {
+        Page<Board> boards;
 
-    // 글 작성
-    public Board createBoard(Board board) {
-        return boardRepository.save(board);
-    }
-
-    // 글 목록 조회 (페이지네이션)
-    public Page<Board> getAllBoards(Pageable pageable) {
-        return boardRepository.findAllByIsDeletedFalse(pageable);
-    }
-
-    // 글 상세 조회
-    public Board getBoardById(Long id) {
-        Board board = boardRepository.findByIdAndIsDeletedFalse(id);
-        if (board == null) {
-            throw new RuntimeException("Board not found or deleted.");
+        // 검색 조건에 따라 분기 처리
+        if (searchType == null || searchType.isEmpty() || keyword == null || keyword.isEmpty()) {
+            boards = boardRepository.findAllByIsDeletedFalse(pageable);
+        } else if ("title".equalsIgnoreCase(searchType)) {
+            boards = boardRepository.findByTitleContainingAndIsDeletedFalse(keyword, pageable);
+        } else if ("username".equalsIgnoreCase(searchType)) {
+            boards = boardRepository.findByAccountUsernameAndIsDeletedFalse(keyword, pageable);
+        } else {
+            throw new IllegalArgumentException("Invalid search type: " + searchType);
         }
-        return board;
-    }
 
-    // 글 수정
-    public Board updateBoard(Long id, Board updatedBoard) {
-        Board existingBoard = getBoardById(id);
-        existingBoard.setTitle(updatedBoard.getTitle());
-        existingBoard.setContent(updatedBoard.getContent());
-        return boardRepository.save(existingBoard);
-    }
-
-    // 글 삭제 (Soft Delete)
-    public void deleteBoard(Long id) {
-        Board board = getBoardById(id);
-        board.setIsDeleted(true);
-        boardRepository.save(board);
+        // 게시글 목록을 DTO로 변환하며 첨부파일 유무 확인
+        return boards.map(board -> new BoardResponseDto(
+                board.getId(),
+                board.getTitle(),
+                board.getAuthor().getName(),
+                board.getView(),
+                attachmentRepository.existsByBoardIdAndIsDeletedFalse(board.getId()), // 첨부파일 유무
+                board.getCreatedAt().toString()
+        ));
     }
 }
