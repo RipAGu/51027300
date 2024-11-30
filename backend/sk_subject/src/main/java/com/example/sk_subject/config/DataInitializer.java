@@ -1,7 +1,7 @@
 package com.example.sk_subject.config;
 
-import com.example.sk_subject.entity.User;
-import com.example.sk_subject.repository.UserRepository;
+import com.example.sk_subject.entity.Account;
+import com.example.sk_subject.repository.AccountRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,22 +11,22 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class DataInitializer {
 
     @Bean
-    public CommandLineRunner initData(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public CommandLineRunner initData(AccountRepository accountRepository, PasswordEncoder passwordEncoder) {
         return args -> {
-            if (userRepository.findByUsername("admin").isEmpty()) {
-                User admin = new User();
+            if (accountRepository.findByUsername("admin").isEmpty()) {
+                Account admin = new Account();
                 admin.setUsername("admin");
                 admin.setPassword(passwordEncoder.encode("admin123"));
                 admin.setRole("ROLE_ADMIN");
-                userRepository.save(admin);
+                accountRepository.save(admin);
             }
 
-            if (userRepository.findByUsername("user").isEmpty()) {
-                User user = new User();
-                user.setUsername("user");
-                user.setPassword(passwordEncoder.encode("user123"));
-                user.setRole("ROLE_USER");
-                userRepository.save(user);
+            if (accountRepository.findByUsername("user").isEmpty()) {
+                Account account = new Account();
+                account.setUsername("user");
+                account.setPassword(passwordEncoder.encode("user123"));
+                account.setRole("ROLE_USER");
+                accountRepository.save(account);
             }
         };
     }

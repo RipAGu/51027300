@@ -1,34 +1,44 @@
 package com.example.sk_subject.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@RequiredArgsConstructor
+@Table(name = "board") // 테이블 이름 매핑
 public class Board {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Primary Key 자동 증가
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255) // 제목은 255자로 제한
     private String title;
 
     @Lob
-    @Column(nullable = false)
+    @Column(nullable = false) // 긴 텍스트 저장을 위해 @Lob 추가
     private String content;
 
-    private int views;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", nullable = false) // 외래키 매핑
+    private Account author; // 작성자 (Account 테이블과 연관)
 
     @Column(nullable = false)
-    private Boolean isDeleted = false;  // Soft Delete 여부
+    private int view = 0; // 기본값 0
 
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false; // Soft Delete 여부
+
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
     @PrePersist
@@ -41,6 +51,4 @@ public class Board {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
-
-    // Getters and Setters
 }

@@ -1,8 +1,8 @@
 package com.example.sk_subject.controller;
 
 import com.example.sk_subject.util.JwtUtil;
-import com.example.sk_subject.entity.User;
-import com.example.sk_subject.repository.UserRepository;
+import com.example.sk_subject.entity.Account;
+import com.example.sk_subject.repository.AccountRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -15,19 +15,19 @@ import java.util.Optional;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
-        this.userRepository = userRepository;
+    public AuthController(AccountRepository accountRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+        this.accountRepository = accountRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User loginRequest) {
-        Optional<User> user = userRepository.findByUsername(loginRequest.getUsername());
+    public ResponseEntity<?> login(@RequestBody Account loginRequest) {
+        Optional<Account> user = accountRepository.findByUsername(loginRequest.getUsername());
         if (user.isPresent() && passwordEncoder.matches(loginRequest.getPassword(), user.get().getPassword())) {
             String token = jwtUtil.generateToken(user.get().getUsername());
 
