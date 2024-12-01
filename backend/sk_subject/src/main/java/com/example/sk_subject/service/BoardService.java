@@ -108,6 +108,8 @@ public class BoardService {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
 
+        board.setView(board.getView() + 1); // 조회수 증가
+
         // 첨부파일 정보 추출
         List<AttachmentResponseDto> attachments = board.getAttachments().stream()
                 .map(attachment -> new AttachmentResponseDto(
