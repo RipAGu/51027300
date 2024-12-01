@@ -1,6 +1,7 @@
 package com.example.sk_subject.service;
 
 import com.example.sk_subject.dto.request.BoardRequestDto;
+import com.example.sk_subject.dto.request.BoardUpdateRequestDto;
 import com.example.sk_subject.dto.response.AttachmentResponseDto;
 import com.example.sk_subject.dto.response.BoardDetailResponseDto;
 import com.example.sk_subject.dto.response.BoardListResponseDto;
@@ -120,6 +121,53 @@ public class BoardService {
                 board.getCreatedAt().toString(),
                 attachments,
                 isMyPost
+        );
+    }
+
+    @Transactional
+    public BoardDetailResponseDto updateBoard(Long id, BoardUpdateRequestDto requestDto, String username) {
+        // 게시글 조회
+        Board board = boardRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+
+        // 작성자 확인
+        if (!board.getAccount().getName().equals(username)) {
+            throw new RuntimeException("게시글을 수정할 권한이 없습니다.");
+        }
+
+        // 제목과 내용 업데이트
+        board.setTitle(requestDto.getTitle());
+        board.setContent(requestDto.getContent());
+
+        // 첨부파일 업데이트 처리
+        if (requestDto.getAttachmentUrl() == null || requestDto.getAttachmentUrl().isEmpty()) {
+            // 첨부파일 삭제
+            board.getAttachments().clear();
+        } else {
+            // 첨부파일 추가
+            Attachment attachment = new Attachment();
+            attachment.setBoard(board);
+            attachment.setName(requestDto.getAttachmentUrl().substring(requestDto.getAttachmentUrl().lastIndexOf('/') + 1));
+            attachment.setUrl(requestDto.getAttachmentUrl());
+            attachment.setType(detectFileType(requestDto.getAttachmentUrl()));
+
+            board.getAttachments().clear(); // 기존 첨부파일 제거
+            board.getAttachments().add(attachment);
+        }
+
+        // 저장
+        Board updatedBoard = boardRepository.save(board);
+
+        // DTO 변환 후 반환
+        return new BoardDetailResponseDto(
+                updatedBoard.getTitle(),
+                updatedBoard.getContent(),
+                updatedBoard.getAccount().getName(),
+                updatedBoard.getCreatedAt().toString(),
+                updatedBoard.getAttachments().stream()
+                        .map(attachment -> new AttachmentResponseDto(attachment.getType(), attachment.getUrl()))
+                        .toList(),
+                true // 본인 게시물 여부
         );
     }
 }

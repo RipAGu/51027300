@@ -1,6 +1,7 @@
 package com.example.sk_subject.controller;
 
 import com.example.sk_subject.dto.request.BoardRequestDto;
+import com.example.sk_subject.dto.request.BoardUpdateRequestDto;
 import com.example.sk_subject.dto.response.BoardAddResponseDto;
 import com.example.sk_subject.dto.response.BoardDetailResponseDto;
 import com.example.sk_subject.dto.response.BoardListResponseDto;
@@ -62,6 +63,20 @@ public class BoardController {
         BoardDetailResponseDto response = boardService.getBoardDetail(id, username);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<BoardDetailResponseDto> updateBoard(
+            @PathVariable Long id,
+            @RequestBody BoardUpdateRequestDto requestDto,
+            @RequestHeader("Authorization") String token) {
+        // JWT 토큰에서 사용자 이름 추출
+        String username = jwtUtil.extractUsername(token.replace("Bearer ", ""));
+
+        // 게시글 수정
+        BoardDetailResponseDto updatedBoard = boardService.updateBoard(id, requestDto, username);
+
+        return ResponseEntity.ok(updatedBoard);
     }
 
 }
