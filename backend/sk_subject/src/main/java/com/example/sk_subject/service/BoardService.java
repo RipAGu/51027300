@@ -14,8 +14,14 @@ import com.example.sk_subject.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -170,4 +176,21 @@ public class BoardService {
                 true // 본인 게시물 여부
         );
     }
+
+    public void deleteBoard(Long boardId, String username) {
+        // 게시글 조회
+        Board board = boardRepository.findByIdAndIsDeletedFalse(boardId)
+                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
+
+        // 작성자 확인
+        if (!board.getAccount().getName().equals(username)) {
+            throw new AccessDeniedException("본인의 게시글만 삭제할 수 있습니다.");
+        }
+
+        // 삭제 처리
+        board.setDeleted(true);
+        boardRepository.save(board);
+    }
+
+
 }

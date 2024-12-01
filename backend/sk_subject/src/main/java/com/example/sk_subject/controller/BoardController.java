@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -77,6 +78,13 @@ public class BoardController {
         BoardDetailResponseDto updatedBoard = boardService.updateBoard(id, requestDto, username);
 
         return ResponseEntity.ok(updatedBoard);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteBoard(@PathVariable Long id, Authentication authentication) {
+        String username = authentication.getName(); // 토큰에서 사용자 이름 가져오기
+        boardService.deleteBoard(id, username);
+        return ResponseEntity.ok("게시물이 삭제되었습니다.");
     }
 
 }
