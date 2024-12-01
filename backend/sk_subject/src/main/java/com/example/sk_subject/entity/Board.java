@@ -3,43 +3,48 @@ package com.example.sk_subject.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
-@Setter
+@Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Table(name = "board") // 테이블 이름 매핑
 public class Board {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Primary Key 자동 증가
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 255) // 제목은 255자로 제한
+    @Column(nullable = false, length = 255)
     private String title;
 
     @Lob
-    @Column(nullable = false) // 긴 텍스트 저장을 위해 @Lob 추가
+    @Column(nullable = false)
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "author_id", nullable = false) // 외래키 매핑
-    private Account author; // 작성자 (Account 테이블과 연관)
+    @JoinColumn(name = "author_id", nullable = false)
+    private Account account;
 
     @Column(nullable = false)
-    private int view = 0; // 기본값 0
+    private int view = 0;
 
     @Column(name = "is_deleted", nullable = false)
-    private boolean isDeleted = false; // Soft Delete 여부
+    private boolean isDeleted = false;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Attachment> attachments = new ArrayList<>(); // 초기화 추가
 
     @PrePersist
     protected void onCreate() {

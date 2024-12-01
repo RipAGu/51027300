@@ -8,7 +8,7 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 @Builder
-public class BoardResponseDto {
+public class BoardListResponseDto {
     private Long id;
     private String title;
     private String authorName;

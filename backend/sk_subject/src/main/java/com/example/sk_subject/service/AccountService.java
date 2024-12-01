@@ -6,18 +6,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserService {
+public class AccountService {
 
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(AccountRepository accountRepository, PasswordEncoder passwordEncoder) {
+    public AccountService(AccountRepository accountRepository, PasswordEncoder passwordEncoder) {
         this.accountRepository = accountRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
-    public Account registerUser(Account account) {
-        account.setPassword(passwordEncoder.encode(account.getPassword())); // 비밀번호 암호화
-        return accountRepository.save(account);
+    public Account findByUsername(String username) {
+        return accountRepository.findByName(username)
+                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
     }
 }

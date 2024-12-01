@@ -10,7 +10,7 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private static final String SECRET_KEY = "your-secret-key-your-secret-key-your-secret-key"; // 길이는 256비트 이상
+    private static final String SECRET_KEY = "KYv4kAVWXWrz2YUcNNITlmtCQ+IkAqU2TUIsoryow+w="; // 길이는 256비트 이상
     private static final long EXPIRATION_TIME = 86400000; // 1일 (밀리초 단위)
 
     private final Key key;

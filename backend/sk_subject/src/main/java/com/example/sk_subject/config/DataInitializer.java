@@ -13,19 +13,17 @@ public class DataInitializer {
     @Bean
     public CommandLineRunner initData(AccountRepository accountRepository, PasswordEncoder passwordEncoder) {
         return args -> {
-            if (accountRepository.findByUsername("admin").isEmpty()) {
+            if (accountRepository.findByName("admin").isEmpty()) {
                 Account admin = new Account();
-                admin.setUsername("admin");
+                admin.setName("admin");
                 admin.setPassword(passwordEncoder.encode("admin123"));
-                admin.setRole("ROLE_ADMIN");
                 accountRepository.save(admin);
             }
 
-            if (accountRepository.findByUsername("user").isEmpty()) {
+            if (accountRepository.findByName("user").isEmpty()) {
                 Account account = new Account();
-                account.setUsername("user");
+                account.setName("user");
                 account.setPassword(passwordEncoder.encode("user123"));
-                account.setRole("ROLE_USER");
                 accountRepository.save(account);
             }
         };

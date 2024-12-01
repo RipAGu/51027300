@@ -6,36 +6,35 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Table(name = "attachment") // 테이블 이름 매핑
 public class Attachment {
 
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Primary Key 자동 증가
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id", nullable = false) // 외래키 매핑
-    private Board board; // 게시글과의 연관 관계
+    @JoinColumn(name = "board_id", nullable = false)
+    private Board board;
 
-    @Column(nullable = false, length = 255) // 첨부파일 이름
+    @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, length = 255) // 파일 URL
+    @Column(nullable = false)
     private String url;
 
-    @Column(nullable = false, length = 255) // 파일 타입 (예: image/jpeg, application/pdf)
+    @Column(nullable = false)
     private String type;
 
     @Column(name = "is_deleted", nullable = false)
-    private boolean isDeleted = false; // Soft Delete 여부
+    private boolean isDeleted = false;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @PrePersist

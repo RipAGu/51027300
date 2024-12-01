@@ -26,8 +26,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .headers(headers -> headers.frameOptions(frame -> frame.disable())) // H2 Console의 iframe 허용
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/h2-console/**", "/api/auth/**").permitAll() // H2 Console 및 로그인/회원가입 요청 허용
-                        .anyRequest().authenticated() // 나머지 요청은 인증 필요
+                        .requestMatchers("/auth/login", "/h2-console/**", "file/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // JWT 필터 추가
         return http.build();

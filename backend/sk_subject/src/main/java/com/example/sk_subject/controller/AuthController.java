@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 public class AuthController {
 
     private final AccountRepository accountRepository;
@@ -27,7 +27,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Account loginRequest) {
-        Optional<Account> user = accountRepository.findByUsername(loginRequest.getName());
+        Optional<Account> user = accountRepository.findByName(loginRequest.getName());
         if (user.isPresent() && passwordEncoder.matches(loginRequest.getPassword(), user.get().getPassword())) {
             String token = jwtUtil.generateToken(user.get().getName());
 
