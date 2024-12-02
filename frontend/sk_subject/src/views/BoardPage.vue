@@ -3,33 +3,53 @@
     <!-- 상단 네비게이션 -->
     <header class="bg-blue-600 text-white px-4 py-3 flex justify-between items-center">
       <h1 class="text-lg font-bold">게시판</h1>
-      <button
-        @click="handleLogin"
-        class="bg-white text-blue-600 font-semibold py-1 px-4 rounded hover:bg-gray-200"
-      >
-        로그인
-      </button>
+      <div>
+        <button
+          v-if="!authStore.isLoggedIn"
+          @click="handleLogin"
+          class="bg-white text-blue-600 font-semibold py-1 px-4 rounded hover:bg-gray-200"
+        >
+          로그인
+        </button>
+        <button
+          v-else
+          @click="handleLogout"
+          class="bg-red-600 text-white font-semibold py-1 px-4 rounded hover:bg-red-700"
+        >
+          로그아웃
+        </button>
+      </div>
     </header>
 
     <!-- 검색 및 게시글 목록 -->
     <main class="flex-grow p-4">
       <!-- 검색 -->
       <div class="flex justify-between items-center mb-4">
-        <select v-model="searchType" class="border px-3 py-2 rounded">
-          <option value="title">제목</option>
-          <option value="authorName">작성자 ID</option>
-        </select>
-        <input
-          type="text"
-          v-model="searchKeyword"
-          class="border px-3 py-2 rounded w-full ml-4 mr-8"
-          placeholder="검색어를 입력하세요"
-        />
+        <div class="flex items-center w-full">
+          <select v-model="searchType" class="border px-3 py-2 rounded">
+            <option value="title">제목</option>
+            <option value="authorName">작성자 ID</option>
+          </select>
+          <input
+            type="text"
+            v-model="searchKeyword"
+            class="border px-3 py-2 rounded w-full ml-4 mr-8"
+            placeholder="검색어를 입력하세요"
+          />
+          <button
+            @click="searchPosts"
+            class="bg-blue-600 text-white rounded w-20 h-8 hover:bg-blue-700"
+          >
+            검색
+          </button>
+        </div>
+        <!-- 글쓰기 버튼 (로그인된 사용자만 표시) -->
         <button
-          @click="searchPosts"
-          class="bg-blue-600 text-white rounded w-20 h-8 hover:bg-blue-700"
+          v-if="authStore.isLoggedIn"
+          @click="createPost"
+          class="ml-4 bg-green-600 text-white font-semibold px-4 py-2 rounded hover:bg-green-700"
         >
-          검색
+          글쓰기
         </button>
       </div>
 
@@ -81,13 +101,19 @@
 </template>
 
 <script>
-import axiosInstance from "../axios";
+import { useAuthStore } from "../stores/auth"; // Pinia store for authentication
+import axiosInstance from "../axios"; // 기본 export를 올바르게 import
 
 export default {
   name: "BoardPage",
+  setup() {
+    const authStore = useAuthStore();
+    return { authStore };
+  },
   data() {
     return {
       posts: [], // 게시글 데이터
+      filteredPosts: [], // 검색 결과 데이터
       searchType: "title", // 검색 기준
       searchKeyword: "", // 검색어
       totalPages: 0, // 총 페이지 수
@@ -97,21 +123,13 @@ export default {
   created() {
     this.fetchPosts(0); // 첫 페이지 데이터 로드
   },
-  computed: {
-    filteredPosts() {
-      // 검색 필터 적용
-      if (!this.searchKeyword) return this.posts;
-      return this.posts.filter((post) =>
-        post[this.searchType]?.toLowerCase().includes(this.searchKeyword.toLowerCase())
-      );
-    },
-  },
   methods: {
     async fetchPosts(page) {
       try {
         const response = await axiosInstance.get(`/board/all?page=${page}&size=10`);
         const data = response.data;
         this.posts = data.content; // 게시글 목록
+        this.filteredPosts = this.posts; // 초기에는 모든 게시글을 표시
         this.totalPages = data.totalPages; // 총 페이지 수
         this.currentPage = page; // 현재 페이지 업데이트
       } catch (error) {
@@ -119,15 +137,26 @@ export default {
       }
     },
     searchPosts() {
-      this.fetchPosts(0); // 검색 시 첫 페이지로 이동
+      if (!this.searchKeyword) {
+        // 검색어가 없으면 전체 게시글 표시
+        this.filteredPosts = this.posts;
+      } else {
+        // 검색어와 검색 기준에 따라 필터링
+        this.filteredPosts = this.posts.filter((post) =>
+          post[this.searchType]?.toLowerCase().includes(this.searchKeyword.toLowerCase())
+        );
+      }
     },
     handleLogin() {
       this.$router.push("/login"); // 로그인 페이지로 이동
     },
+    handleLogout() {
+      this.authStore.logout(); // Pinia 스토어에서 로그아웃 처리
+      alert("로그아웃 성공!");
+    },
+    createPost() {
+      this.$router.push("/board/create"); // 글쓰기 페이지로 이동
+    },
   },
 };
 </script>
-
-<style scoped>
-/* 추가 스타일 필요 시 여기에 작성 */
-</style>
