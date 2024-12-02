@@ -28,7 +28,7 @@
         <div class="flex items-center w-full">
           <select v-model="searchType" class="border px-3 py-2 rounded">
             <option value="title">제목</option>
-            <option value="authorName">작성자 ID</option>
+            <option value="username">작성자 ID</option>
           </select>
           <input
             type="text"
@@ -47,7 +47,7 @@
         <button
           v-if="authStore.isLoggedIn"
           @click="createPost"
-          class="ml-4 bg-green-600 text-white font-semibold px-4 py-2 rounded hover:bg-green-700"
+          class="ml-4 bg-green-600 text-white font-semibold px-4 py-2 w-20 rounded hover:bg-green-700"
         >
           글쓰기
         </button>
@@ -125,28 +125,58 @@ export default {
   },
   methods: {
     async fetchPosts(page) {
-      try {
-        const response = await axiosInstance.get(`/board/all?page=${page}&size=10`);
-        const data = response.data;
-        this.posts = data.content; // 게시글 목록
-        this.filteredPosts = this.posts; // 초기에는 모든 게시글을 표시
-        this.totalPages = data.totalPages; // 총 페이지 수
-        this.currentPage = page; // 현재 페이지 업데이트
-      } catch (error) {
-        console.error("게시글 목록을 불러오는 데 실패했습니다:", error);
-      }
-    },
-    searchPosts() {
-      if (!this.searchKeyword) {
-        // 검색어가 없으면 전체 게시글 표시
-        this.filteredPosts = this.posts;
-      } else {
-        // 검색어와 검색 기준에 따라 필터링
-        this.filteredPosts = this.posts.filter((post) =>
-          post[this.searchType]?.toLowerCase().includes(this.searchKeyword.toLowerCase())
-        );
-      }
-    },
+  try {
+    const params = {
+      page: page,
+      size: 10,
+    };
+
+    // 검색 조건이 있을 경우 쿼리 파라미터에 추가
+    if (this.searchKeyword) {
+      params.searchType = this.searchType;
+      params.keyword = this.searchKeyword;
+    }
+
+    const response = await axiosInstance.get("/board/all", { params });
+    const data = response.data;
+
+    // 데이터 갱신
+    this.posts = data.content;
+    this.filteredPosts = this.posts;
+    this.totalPages = data.totalPages;
+    this.currentPage = page; // 현재 페이지 업데이트
+  } catch (error) {
+    console.error("게시글 목록을 불러오는 데 실패했습니다:", error);
+  }
+},
+async searchPosts() {
+  if (!this.searchKeyword) {
+    this.fetchPosts(0); // 검색어가 없으면 전체 게시글 표시
+    return;
+  }
+
+  try {
+    // 첫 페이지부터 검색
+    const params = {
+      searchType: this.searchType,
+      keyword: this.searchKeyword,
+      page: 0,
+      size: 10,
+    };
+
+    const response = await axiosInstance.get("/board/all", { params });
+    const data = response.data;
+
+    // 검색 결과 갱신
+    this.posts = data.content;
+    this.filteredPosts = this.posts;
+    this.totalPages = data.totalPages;
+    this.currentPage = 0; // 검색 결과는 항상 첫 페이지로 설정
+  } catch (error) {
+    console.error("검색 요청 실패:", error);
+    alert("검색 중 오류가 발생했습니다.");
+  }
+},
     handleLogin() {
       this.$router.push("/login"); // 로그인 페이지로 이동
     },
