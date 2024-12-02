@@ -1,25 +1,17 @@
-// src/stores/auth.js
 import { defineStore } from "pinia";
-import axios from "axios";
 
 export const useAuthStore = defineStore("auth", {
     state: () => ({
-        user: null,
-        isAuthenticated: false,
+        isLoggedIn: !!sessionStorage.getItem("userToken"), // 세션에서 초기 로그인 상태 확인
     }),
     actions: {
-        async login(credentials) {
-            try {
-                const response = await axios.post("/api/login", credentials);
-                this.user = response.data.user;
-                this.isAuthenticated = true;
-            } catch (error) {
-                throw new Error("아이디 또는 비밀번호가 일치하지 않습니다.");
-            }
+        login(token) {
+            sessionStorage.setItem("userToken", token); // 토큰 저장
+            this.isLoggedIn = true; // 로그인 상태 업데이트
         },
         logout() {
-            this.user = null;
-            this.isAuthenticated = false;
+            sessionStorage.removeItem("userToken"); // 토큰 제거
+            this.isLoggedIn = false; // 로그인 상태 업데이트
         },
     },
 });

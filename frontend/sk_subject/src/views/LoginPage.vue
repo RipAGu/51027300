@@ -1,12 +1,4 @@
 <template>
-    <!--
-  This example requires updating your template:
-
-  ```
-  <html class="h-full bg-white">
-  <body class="h-full">
-  ```
--->
 <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
 
 
@@ -40,31 +32,31 @@
 
   </template>
   
-  <script>
-  import { useAuthStore } from "../stores/auth";
-  
-  export default {
-    name: "LoginPage",
-    data() {
-      return {
-        username: "",
-        password: "",
-        errorMessage: "",
-      };
+<script>
+import { useAuthStore } from "../stores/auth";
+
+export default {
+  name: "LoginPage",
+  data() {
+    return {
+      username: "",
+      password: "",
+    };
+  },
+  methods: {
+    async handleLogin() {
+      const authStore = useAuthStore();
+
+      // 백엔드 로그인 API 호출 (예제용)
+      const token = "exampleToken"; // API에서 받은 토큰으로 대체
+      authStore.login(token); // Pinia 상태 업데이트
+      alert("로그인 성공!");
+      this.$router.push("/board"); // 로그인 후 게시판으로 이동
     },
-    methods: {
-      async handleLogin() {
-        const authStore = useAuthStore();
-        try {
-          await authStore.login({ username: this.username, password: this.password });
-          this.$router.push("/dashboard"); // 로그인 성공 시 대시보드로 이동
-        } catch (error) {
-          this.errorMessage = error.message || "로그인에 실패했습니다.";
-        }
-      },
-    },
-  };
-  </script>
-  
-  <style scoped>
-  </style>
+  },
+};
+</script>
+
+<style scoped>
+/* 필요시 추가 스타일 작성 */
+</style>
