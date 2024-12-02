@@ -28,7 +28,7 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(frame -> frame.disable())) // H2 Console의 iframe 허용
                 .authorizeHttpRequests(auth -> auth
                         // 인증 없이 접근 가능한 URL 패턴 설정
-                        .requestMatchers( "/auth/login", "/h2-console/**", "/file/**", "/board/all", "/board/{id:[0-9]+}").permitAll()
+                        .requestMatchers( "/auth/login", "/h2-console/**", "/file/**", "/board/all", "/board/{id:[0-9]+}", "/uploads/**").permitAll()
                         // 인증이 필요한 URL 패턴 설정 (POST, PUT, DELETE)
                         .requestMatchers(HttpMethod.POST, "/board/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/board/**").authenticated()

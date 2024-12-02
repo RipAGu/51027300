@@ -56,9 +56,13 @@ public class BoardController {
     @GetMapping("/{id}")
     public ResponseEntity<BoardDetailResponseDto> getBoardDetail(
             @PathVariable Long id,
-            @RequestHeader("Authorization") String token) {
-        // JWT 토큰에서 사용자 이름 추출
-        String username = jwtUtil.extractUsername(token.replace("Bearer ", ""));
+            @RequestHeader(value = "Authorization", required = false) String token) {
+        String username = null;
+
+        // 토큰이 존재할 경우 사용자 이름 추출
+        if (token != null && token.startsWith("Bearer ")) {
+            username = jwtUtil.extractUsername(token.replace("Bearer ", ""));
+        }
 
         // 게시글 상세 정보 가져오기
         BoardDetailResponseDto response = boardService.getBoardDetail(id, username);

@@ -83,7 +83,7 @@ public class BoardService {
             board.getAttachments().add(attachment);
         }
 
-        // 3. Board를 저장하면서 연관된 Attachment도 함께 저장됨 (cascade 설정 덕분에)
+        // 3. Board를 저장하면서 연관된 Attachment도 함께 저장됨
         return boardRepository.save(board);
     }
 
@@ -108,7 +108,8 @@ public class BoardService {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
 
-        board.setView(board.getView() + 1); // 조회수 증가
+        // 조회수  증가
+        incrementViewCount(id);
 
         // 첨부파일 정보 추출
         List<AttachmentResponseDto> attachments = board.getAttachments().stream()
@@ -118,8 +119,8 @@ public class BoardService {
                 ))
                 .toList();
 
-        // 자신이 작성한 게시글인지 확인
-        boolean isMyPost = board.getAccount().getName().equals(username);
+        // 자신이 작성한 게시글인지 확인 (username이 null인 경우 false)
+        boolean isMyPost = username != null && board.getAccount().getName().equals(username);
 
         // DTO로 변환
         return new BoardDetailResponseDto(
@@ -130,6 +131,12 @@ public class BoardService {
                 attachments,
                 isMyPost
         );
+    }
+
+    @Transactional
+    public void incrementViewCount(Long boardId) {
+        boardRepository.incrementViewCount(boardId);
+        System.out.println("조회수 증가 완료: " + boardId);
     }
 
     @Transactional
