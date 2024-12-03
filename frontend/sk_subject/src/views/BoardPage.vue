@@ -102,7 +102,7 @@
 
 <script>
 import { useAuthStore } from "../stores/auth"; // Pinia store for authentication
-import axiosInstance from "../axios"; // 기본 export를 올바르게 import
+import axiosInstance from "../axios"; 
 
 export default {
   name: "BoardPage",
