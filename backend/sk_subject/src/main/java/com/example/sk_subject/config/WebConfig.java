@@ -21,12 +21,14 @@ public class WebConfig implements WebMvcConfigurer {
 
     }
 
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins("http://localhost:5137", "http://localhost:5173") // Vue 서버 출처
-                .allowedMethods("*") // 모든 HTTP 메서드 허용
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // 필요한 메서드만 허용
                 .allowedHeaders("*") // 모든 헤더 허용
-                .allowCredentials(true); // 인증 정보(쿠키, Authorization 헤더) 허용
+                .allowCredentials(true) // 인증 정보(쿠키, Authorization 헤더) 허용
+                .maxAge(3600); // 캐시 시간 (1시간)
     }
 }

@@ -27,15 +27,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .headers(headers -> headers.frameOptions(frame -> frame.disable())) // H2 Console의 iframe 허용
                 .authorizeHttpRequests(auth -> auth
-                        // 인증 없이 접근 가능한 URL 패턴 설정
-                        .requestMatchers( "/auth/login", "/h2-console/**", "/file/**", "/board/all", "/board/{id:[0-9]+}", "/uploads/**").permitAll()
-                        // 인증이 필요한 URL 패턴 설정 (POST, PUT, DELETE)
-                        .requestMatchers(HttpMethod.POST, "/board/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/board/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/board/**").authenticated()
-                        // 기타 모든 요청은 인증 필요
+                        .requestMatchers("/auth/**", "/uploads/**", "/board/**", "/file").permitAll() // 인증 없이 접근 가능
                         .anyRequest().authenticated()
                 )
+
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // JWT 필터 추가
         return http.build();
     }

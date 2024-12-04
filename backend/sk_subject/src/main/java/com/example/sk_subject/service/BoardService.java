@@ -136,7 +136,6 @@ public class BoardService {
     @Transactional
     public void incrementViewCount(Long boardId) {
         boardRepository.incrementViewCount(boardId);
-        System.out.println("조회수 증가 완료: " + boardId);
     }
 
     @Transactional
