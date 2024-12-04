@@ -2,8 +2,11 @@
   <div class="min-h-screen flex flex-col bg-gray-100">
     <!-- 상단 영역 -->
     <header class="bg-blue-600 text-white px-4 py-3">
-      <h1 class="text-lg font-bold">게시글 상세</h1>
+      <a href="/board" class="text-lg font-bold text-white hover:underline">
+        게시글 상세
+      </a>
     </header>
+
 
     <!-- 게시글 내용 -->
     <main class="flex-grow p-6">

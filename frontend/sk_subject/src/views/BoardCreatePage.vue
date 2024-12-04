@@ -2,8 +2,10 @@
     <div class="min-h-screen flex flex-col bg-gray-100">
       <!-- 상단 네비게이션 -->
       <header class="bg-blue-600 text-white px-4 py-3">
-        <h1 class="text-lg font-bold text-center">게시글 작성</h1>
-      </header>
+      <a href="/board" class="text-lg font-bold text-white hover:underline">
+        게시글 작성
+      </a>
+    </header>
   
       <main class="flex-grow p-6">
         <div class="bg-white rounded shadow p-6">
@@ -72,7 +74,7 @@
   import axiosInstance from "../axios";
   
   export default {
-    name: "CreatePostPage",
+    name: "BoardCreatePage",
     data() {
       return {
         title: "",

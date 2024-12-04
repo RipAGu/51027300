@@ -185,7 +185,7 @@ async searchPosts() {
       alert("로그아웃 성공!");
     },
     createPost() {
-      this.$router.push("/board/create"); // 글쓰기 페이지로 이동
+      this.$router.push("/create"); // 글쓰기 페이지로 이동
     },
   },
 };
