@@ -27,7 +27,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .headers(headers -> headers.frameOptions(frame -> frame.disable())) // H2 Console의 iframe 허용
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/uploads/**", "/board/**", "/file").permitAll() // 인증 없이 접근 가능
+                        .requestMatchers("/auth/**", "/uploads/**", "/board/**", "/file", "/h2-console/**").permitAll() // 인증 없이 접근 가능
                         .anyRequest().authenticated()
                 )
 
